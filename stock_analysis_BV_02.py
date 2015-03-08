@@ -60,6 +60,7 @@ def buffett_score(ticker_symbol):
     text_soup = BeautifulSoup(urlopen(full_url).read()) #read in
 #    print text_soup
     price = text_soup.find('p', {'class': 'data bgLast'})
+    price = price.string.replace(',', '') #trap for comma in price
 #    print 'Current/Last Price:', price.string
     titles = text_soup.findAll('p', {'class': 'column'})
 #    print titles
@@ -70,11 +71,13 @@ def buffett_score(ticker_symbol):
         if 'P/E Current' in title.text:
             for PE in title.findNextSiblings(attrs={'class': 'data lastcolumn'}):
                 pe = PE.text
+                pe = pe.replace(',','')  # if there is a comma, remove it
                 flag1 = 1
                 
         if 'Price to Book Ratio' in title.text:
             for PBR in title.findNextSiblings(attrs={'class': 'data lastcolumn'}):
                 pbr = PBR.text
+                pbr = pbr.replace(',', '') 
                 flag2 = 1
     if 'pbr' not in locals():
         pbr = 0.0
@@ -92,9 +95,10 @@ def buffett_score(ticker_symbol):
             pe = 0
         elif pe[1] == ',':
             pe = pe[0] + pe[2:]
-    if price.string[1] == ',':
-        price.string =  price.string[0] + price.string[2:]
-    return float(price.string), float(pe), float(pbr), float(pe) * float(pbr)
+    # using price.replace above to trap for comma
+#    if price.string[1] == ',':
+#        price.string =  price.string[0] + price.string[2:]
+    return float(price), float(pe), float(pbr), float(pe) * float(pbr)
 
 
 if __name__ == '__main__':
@@ -106,11 +110,11 @@ if __name__ == '__main__':
 #    symbol = ['crs']
     symbol = []
     
-    ifile = open('sp500_2.csv', 'r')#S&P 500 
+    ifile = open('sp500_3.csv', 'r')#S&P 500 
 #    ifile = open('sp400.csv','r') #S&P 400 Mid Cap
 #    ifile = open('sp600.csv','r') #S&P 400 Mid Cap
     
-    OFILE = open('data_buffett_largecap_20140901.txt', 'w')
+    OFILE = open('data_buffett_largecap_20150308.txt', 'w')
 #    OFILE = open('data_buffett_midcap_20140503.txt', 'w')
 #    OFILE = open('data_buffett_smallcap_20140503.txt', 'w')
     
